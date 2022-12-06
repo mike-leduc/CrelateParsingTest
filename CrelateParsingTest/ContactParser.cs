@@ -1,61 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+﻿using CrelateParsingTest.Extensions;
+using CrelateParsingTest.Interfaces;
+using CrelateParsingTest.Models;
 
 namespace CrelateParsingTest;
 
 public class ContactParser : IContactParser
 {
-    public IEnumerable<Contact> ParseRecords(string contacts)
+    public ContactCollection ParseRecords(string contacts)
     {
+        ContactCollection result = new ContactCollection();
+
         // gotta have data or we can't do anything
         if (string.IsNullOrEmpty(contacts))
-            return Enumerable.Empty<Contact>();
+            return result;
 
+        // Split on NewLines
         string[] records = contacts.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
 
         // We are assuming that we have a header in this data
         // Based on that assumption, if the length is 1 then all we have is a header, so no processing can occur.
         if (records.Length < 2)
-            return Enumerable.Empty<Contact>();
+            return result;        
 
-        // Use this to aid in duplicate detection
-        List<Contact> result = new List<Contact>();
-
-        for (int i = 1; i < records.Length; i++)
+        for (int index = 1; index < records.Length; index++)
         {
-            string record = records[i];
+            string record = records[index];
             if (string.IsNullOrEmpty(record)) 
                 continue;
 
-            var columns = record.Split(',', StringSplitOptions.TrimEntries);
+            var columns = record.Split(',', StringSplitOptions.TrimEntries); // Trim whitespace from entries
 
-            // Ideal length is 4: Id,FirstName,LastName,PhoneNumber
-            Contact? contact = CreateContact(columns);
-            if (contact != null)
-            {
-                result.Add(contact);
-            }
+            // Correct? length is 4: Id,FirstName,LastName,PhoneNumber
+            Contact? contact = CreateContact(columns, out string? errorMessage);
+            result.AddContact(index, record, contact, errorMessage);
         }
 
         return CheckForDuplicates(result);
     }
 
-    private IEnumerable<Contact> CheckForDuplicates(List<Contact> contacts)
+    private ContactCollection CheckForDuplicates(ContactCollection contacts)
     {
         // Detect duplicates
-        var duplicates = contacts
-            .Select((t, i) => new { Index = i, Contact = t })
+        var duplicates = contacts.Contacts
+            .Select(t => new { Index = t.rowIndex, Contact = t.contact })
             .Where(x => !string.IsNullOrEmpty(x.Contact.PhoneNumber))
             .GroupBy(g => g.Contact.PhoneNumber)
             .Where(g => g.Count() > 1);
 
-        // Don't do anything if we don't have any duplicats
+        // Don't do anything if we don't have any duplicates
         if (duplicates.Any())
         {
             List<int> duplicateIndexes = new List<int>();
@@ -66,44 +58,38 @@ public class ContactParser : IContactParser
 
             foreach (var index in duplicateIndexes)
             {
-                contacts[index].IsDuplicate = true;
+                var record = contacts[index];
+                if (record != null)
+                    record.IsDuplicate = true;
             }
         }
 
         return contacts;
     }
 
-    private Contact? CreateContact(string[] contactInfo)
+    private Contact? CreateContact(string[] contactInfo, out string? errorMessage)
     {
+        errorMessage = null;
         // It would take much more advanced logic to deal with records that have too many columns,
         // and columns that don't match the expected data type.
         // It could be done, but probably not worth it for this exercise
         if (contactInfo.Length != 4)
         {
-            Console.WriteLine($"Invalid record format: {string.Join(",", contactInfo)}. Expected 4 columns, Actual: {contactInfo.Length}");
+            errorMessage = $"Invalid record format: Expected 4 columns, Actual # of columns: {contactInfo.Length}";
+            //Console.WriteLine(errorMessage); //Would advocate logging these somewhere
+
             return null;
         }
 
         if (!Guid.TryParse(contactInfo[0], out Guid guid))
-            guid = Guid.NewGuid();
+            guid = Guid.Empty;
 
-        Contact result = new Contact
-        {
-            Id = guid,
-            FirstName = contactInfo[1],
-            LastName = contactInfo[2],
-            PhoneNumber = string.IsNullOrEmpty(contactInfo[3]) ? "" : NormalizePhoneNumber(contactInfo[3]) // Not sure what to do here if a phone number is missing
-        };
-
-        return result;
-    }
-
-    private static string NormalizePhoneNumber(string phoneNumber)
-    {
-        if (string.IsNullOrEmpty(phoneNumber))
-            return phoneNumber;
-
-        // Given more time I would probably use RegEx to do this work with some better pattern matching
-        return phoneNumber.Replace("(", string.Empty).Replace(")", string.Empty).Replace("-", string.Empty).Replace(" ", string.Empty).Trim();
+        return new Contact
+        (
+            guid,
+            contactInfo[1],
+            contactInfo[2],
+            string.IsNullOrEmpty(contactInfo[3]) ? "" : contactInfo[3].NormalizePhoneNumber() // Not sure what to do here if a phone number is missing
+        );
     }
 }

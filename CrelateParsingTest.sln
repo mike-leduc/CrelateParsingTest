@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrelateParsingTest", "CrelateParsingTest\CrelateParsingTest.csproj", "{65EA8B51-379D-4BB6-8060-40C7556F650E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CrelateParsingTest", "CrelateParsingTest\CrelateParsingTest.csproj", "{65EA8B51-379D-4BB6-8060-40C7556F650E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestCrelateCode", "TestCrelateCode\TestCrelateCode.csproj", "{DEDD1C81-9CEF-41A7-B0E6-8C9A97838818}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{65EA8B51-379D-4BB6-8060-40C7556F650E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{65EA8B51-379D-4BB6-8060-40C7556F650E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{65EA8B51-379D-4BB6-8060-40C7556F650E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DEDD1C81-9CEF-41A7-B0E6-8C9A97838818}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DEDD1C81-9CEF-41A7-B0E6-8C9A97838818}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DEDD1C81-9CEF-41A7-B0E6-8C9A97838818}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DEDD1C81-9CEF-41A7-B0E6-8C9A97838818}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

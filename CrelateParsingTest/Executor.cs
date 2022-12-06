@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CrelateParsingTest.Interfaces;
 
 namespace CrelateParsingTest;
 
@@ -22,12 +18,12 @@ public class Executor
         var results = Parser.ParseRecords(contacts);
         Validator.Validate(results);
 
-        foreach (var item in results)
+        foreach (var item in results.AllContacts)
         {
-            string validationError = string.IsNullOrEmpty(item.ValidationError) ? string.Empty : $"Validation Error: {item.ValidationError}, ";
+            string recordValue = "contact: " + (item.record.Contact == null ? item.record.RawRecord : $"{item.record.Contact}");
+            string validationError = string.IsNullOrEmpty(item.record.ValidationError) ? string.Empty : $", Validation Error: {item.record.ValidationError}";
 
-            Console.WriteLine($"Contact=> Id: {item.Id}, FirstName: {item.FirstName}, LastName: {item.LastName}, " +
-                $"PhoneNumber: {item.PhoneNumber}, IsValid: {item.IsValid}, {validationError}IsDuplicate: {item.IsDuplicate}");
+            Console.WriteLine($"Contact=> RowNumber: {item.rowIndex}, {recordValue}, isValid: {item.record.IsValid}, isDuplicate: {item.record.IsDuplicate}{validationError}");
         }
     }
 }
