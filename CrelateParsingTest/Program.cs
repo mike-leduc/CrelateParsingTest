@@ -30,7 +30,7 @@ B8E6C4AD-EC28-42FD-53FB-1C233F80DA08,Jennifer,Coolidge,Kirkland,202-555-7654";
     {
         var services = new ServiceCollection();
         ConfigureServices(services);
-        var serviceProvider = services.BuildServiceProvider();
+        var serviceProvider = services.BuildServiceProvider(true);
 
         var executor = serviceProvider.GetService<Executor>();
 
@@ -41,7 +41,7 @@ B8E6C4AD-EC28-42FD-53FB-1C233F80DA08,Jennifer,Coolidge,Kirkland,202-555-7654";
     {
         services
             .AddSingleton<Executor>()
-            .AddScoped<IContactParser, ContactParser>()
-            .AddScoped<IContactValidator, ContactValidator>();
+            .AddSingleton<IContactParser, ContactParser>()
+            .AddSingleton<IContactValidator, ContactValidator>();
     }
 }

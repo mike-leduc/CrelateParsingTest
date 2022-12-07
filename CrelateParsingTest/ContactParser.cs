@@ -15,7 +15,7 @@ public class ContactParser : IContactParser
             return result;
 
         // Split on NewLines
-        string[] records = contacts.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+        string[] records = contacts.Split(Environment.NewLine, StringSplitOptions.None);
 
         // We are assuming that we have a header in this data
         // Based on that assumption, if the length is 1 then all we have is a header, so no processing can occur.

@@ -13,6 +13,10 @@ public class Executor
         Validator = contactValidator;
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="contacts"></param>
     public void Execute(string contacts)
     {
         var results = Parser.ParseRecords(contacts);
